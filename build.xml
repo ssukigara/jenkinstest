@@ -5,14 +5,14 @@
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="jenkinsTest">
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="../../eclipseEE"/>
+    <property name="lib" value="./lib"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.7"/>
     <property name="source" value="1.7"/>
     <path id="JUnit 4.libraryclasspath">
-        <pathelement location="${ECLIPSE_HOME}/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
-        <pathelement location="${ECLIPSE_HOME}/plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+        <pathelement location="${lib}/junit.jar"/>
+        <pathelement location="${lib}/org.hamcrest.core_1.3.0.v201303031735.jar"/>
     </path>
     <path id="jenkinsTest.classpath">
         <pathelement location="bin"/>
@@ -40,26 +40,10 @@
             <classpath refid="jenkinsTest.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
+    <target name="exec">
+        <java classname="sample.Main" classpath="./bin" />
     </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
-    </target>
-    <target name="Main (1)">
-        <java classname="sample.Main" failonerror="true" fork="yes">
-            <classpath refid="jenkinsTest.classpath"/>
-        </java>
-    </target>
-    <target name="jenkinsTest">
+    <target name="test">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
             <formatter type="xml"/>
@@ -67,7 +51,7 @@
             <classpath refid="jenkinsTest.classpath"/>
         </junit>
     </target>
-    <target name="junitreport">
+    <target name="report">
         <junitreport todir="${junit.output.dir}">
             <fileset dir="${junit.output.dir}">
                 <include name="TEST-*.xml"/>
